@@ -1,0 +1,20 @@
+{
+	"Description": "Multilogger Logging Driver",
+	"Documentation": "https://github.com/allgdante/docker-multilogger-plugin",
+	"Entrypoint": ["/bin/docker-multilogger-plugin"],
+	"Network": {
+		"type": "host"
+	},
+	"Interface": {
+		"types": ["docker.logdriver/1.0"],
+		"socket": "multilogger.sock"
+	},
+	"Env": [
+		{
+			"name": "LOG_LEVEL",
+			"description": "Set log level to output for plugin logs",
+			"value": "info",
+			"settable": ["value"]
+		}
+	]
+}

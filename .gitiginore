@@ -1,0 +1,4 @@
+*~
+*.swp
+.plugin/
+docker-multilogger-plugin
