@@ -35,6 +35,7 @@ const (
 	TLSSkipVerifyKey = DriverName + "-tls-skip-verify"
 	HostnameKey      = DriverName + "-hostname"
 	MSGIDKey         = DriverName + "-msgid"
+	DisableFramerKey = DriverName + "-disable-framer"
 	EnvKey           = "env"
 	EnvRegexKey      = "env-regex"
 	LabelsKey        = "labels"
@@ -120,6 +121,13 @@ func New(info logger.Info) (logger.Logger, error) {
 		return nil, err
 	}
 
+	var disableFramer bool
+	if df, ok := info.Config[DisableFramerKey]; ok {
+		if disableFramer, err = strconv.ParseBool(df); err != nil {
+			return nil, errdefs.InvalidParameter(err)
+		}
+	}
+
 	var log *syslog.Writer
 	if proto == secureProto {
 		tlsConfig, tlsErr := parseTLSConfig(info.Config)
@@ -139,7 +147,7 @@ func New(info logger.Info) (logger.Logger, error) {
 	}
 
 	log.SetFormatter(rfc5424Formatter(timeFormat, msgid, extra))
-	if proto == secureProto {
+	if !disableFramer {
 		log.SetFramer(syslog.RFC5425MessageLengthFramer)
 	}
 
@@ -184,6 +192,7 @@ func ValidateLogOpt(cfg map[string]string) error {
 		case TLSSkipVerifyKey:
 		case HostnameKey:
 		case MSGIDKey:
+		case DisableFramerKey:
 		case TagKey:
 		default:
 			return fmt.Errorf("unknown log opt '%s' for syslog5424 log driver", key)

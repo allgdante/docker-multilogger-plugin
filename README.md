@@ -282,6 +282,7 @@ It's a modified `syslog` driver that puts labels and environment variables as st
 | `syslog5424-tls-skip-verify`              | If set to true, TLS verification is skipped when connecting to the syslog daemon. Defaults to `false`. Ignored if the address protocol is not `tcp+tls`. |
 | `syslog5424-hostname`                     | Defaults to `os.Hostname()`, but we could use a literal value or a template using the [info](https://godoc.org/github.com/docker/docker/daemon/logger#Info) struct as reference. | 
 | `syslog5424-msgid`                        | Defaults to the `syslog5424-tag` value, but we could use a literal value or a template using the [info](https://godoc.org/github.com/docker/docker/daemon/logger#Info) struct as reference. |
+| `syslog5424-disable-framer`               | If `true`, we won't sent the RFC5425 message length framer. Disabled by default.                                          |
 | `syslog5424-labels`                       | List of comma-separated labels that will be used as structured data in every message.                                     |
 | `syslog5424-labels-regex`                 | Regular expression to match labels that will be used as structured data in every message.                                 |
 | `syslog5424-env`                          | List of comma-separated environment variables that will be used as structured data in every message.                      |
