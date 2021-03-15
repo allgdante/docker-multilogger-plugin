@@ -2,7 +2,7 @@
 
 ## Overview
 
-This Docker plugins sends container logs to multuple destinations at once. These instructions are for Linux host systems. For other platforms, see the [Docker Engine managed plugin system documentation](https://docs.docker.com/engine/extend/).
+This Docker plugins sends container logs to multiple destinations at once. These instructions are for Linux host systems. For other platforms, see the [Docker Engine managed plugin system documentation](https://docs.docker.com/engine/extend/).
 
 If you have any questions or issues using the Docker plugin feel free to open an issue in this [repository](https://github.com/allgdante/docker-multilogger-plugin/issues).
 
