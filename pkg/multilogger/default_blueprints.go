@@ -195,6 +195,8 @@ var (
 			syslog5424.TLSCertKey,
 			syslog5424.TLSKeyKey,
 			syslog5424.TLSSkipVerifyKey,
+			syslog5424.HostnameKey,
+			syslog5424.MSGIDKey,
 			syslog5424.DriverName + "-" + syslog5424.LabelsKey,
 			syslog5424.DriverName + "-" + syslog5424.LabelsRegexKey,
 			syslog5424.DriverName + "-" + syslog5424.EnvKey,
