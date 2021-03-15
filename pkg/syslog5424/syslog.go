@@ -115,16 +115,12 @@ func New(info logger.Info) (logger.Logger, error) {
 		return nil, errdefs.InvalidParameter(err)
 	}
 
-	var log *syslog.Writer
-
 	hostname, err := parseOptAsTemplate(info, HostnameKey)
 	if err != nil {
 		return nil, err
 	}
-	if hostname != "" {
-		log.SetHostname(hostname)
-	}
 
+	var log *syslog.Writer
 	if proto == secureProto {
 		tlsConfig, tlsErr := parseTLSConfig(info.Config)
 		if tlsErr != nil {
@@ -134,9 +130,12 @@ func New(info logger.Info) (logger.Logger, error) {
 	} else {
 		log, err = syslog.Dial(proto, address, facility, tag)
 	}
-
 	if err != nil {
 		return nil, err
+	}
+
+	if hostname != "" {
+		log.SetHostname(hostname)
 	}
 
 	log.SetFormatter(rfc5424Formatter(timeFormat, msgid, extra))
