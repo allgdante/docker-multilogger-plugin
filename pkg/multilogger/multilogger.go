@@ -91,13 +91,13 @@ func Validator(blueprints []Blueprint) logger.LogOptValidator {
 				}
 
 				if lerr := blp.Validate(logcfg); lerr != nil {
-					err = multierror.Append(err, fmt.Errorf("%s: %w", blp.Name, serr))
+					err = multierror.Append(err, fmt.Errorf("%s: %w", blp.Name, lerr))
 					continue
 				}
 			}
 		}
 
-		return err
+		return
 	}
 }
 
@@ -122,7 +122,7 @@ func Creator(blueprints []Blueprint) logger.Creator {
 				newinfo.Config = logcfg
 				logdrv, lerr := blp.Create(newinfo)
 				if lerr != nil {
-					err = multierror.Append(err, fmt.Errorf("%s: %w", blp.Name, serr))
+					err = multierror.Append(err, fmt.Errorf("%s: %w", blp.Name, lerr))
 					continue
 				}
 				loggers = append(loggers, logdrv)
