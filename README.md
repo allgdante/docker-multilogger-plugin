@@ -13,7 +13,7 @@ If you have any questions or issues using the Docker plugin feel free to open an
 Pull the plugin from the Docker Store
 
 ```
-$ docker plugin install --alias multilogger allgdante/docker-multilogger-plugin:0.0.1
+$ docker plugin install --alias multilogger:latest allgdante/docker-multilogger-plugin:0.0.2
 ```
 
 Enable the plugin
@@ -95,6 +95,7 @@ If we want to include options, it must be configured like this:
 {
     "log-driver": "multilogger",
     "log-opts": {
+        "multilogger-max-size": "2m",
         "json-file-enabled": "true",
         "gelf-enabled": "true",
         "gelf-address": "udp://127.0.0.1:12201",
@@ -104,7 +105,15 @@ If we want to include options, it must be configured like this:
 }
 ```
 
+This way, we will have a multilogger driver configured who writes to json, gelf, and syslog with a maximum log line of 2 MB.
+
 ### Available options and logging drivers
+
+#### Multilogger logging driver
+
+| Option                                    | Description                                       |
+|-------------------------------------------|---------------------------------------------------|
+| `multilogger-max-size`                    | The maximum size of a log message before it is send to the configured drivers. A positive integer plus a modifier representing the unit of measure (k, m, or g). Defaults to `2 >> 20`. |
 
 #### JSON File logging driver
 

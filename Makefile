@@ -1,5 +1,5 @@
 PLUGIN_NAME = allgdante/docker-multilogger-plugin
-PLUGIN_TAG := 0.0.1
+PLUGIN_TAG := 0.0.2
 PLUGIN_DIR = $(CURDIR)/.plugin
 
 clean:
