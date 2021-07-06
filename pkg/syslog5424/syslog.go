@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	syslog "github.com/allgdante/srslog"
+	syslog "github.com/allgdante/docker-multilogger-plugin/internal/srslog"
 
 	"github.com/docker/docker/daemon/logger"
 	"github.com/docker/docker/daemon/logger/loggerutils"
@@ -146,7 +146,7 @@ func New(info logger.Info) (logger.Logger, error) {
 		log.SetHostname(hostname)
 	}
 
-	log.SetFormatter(rfc5424Formatter(timeFormat, msgid, extra))
+	log.SetFormatter(rfc5424Formatter(timeFormat, hostname, msgid, tag, facility, extra))
 	if !disableFramer {
 		log.SetFramer(syslog.RFC5425MessageLengthFramer)
 	}
@@ -307,12 +307,29 @@ func parseOptAsTemplate(info logger.Info, key string) (string, error) {
 }
 
 // rfc5424Formatter provides an RFC 5424 compliant message formatter.
-func rfc5424Formatter(timeFormat, msgid string, extra map[string]string) syslog.Formatter {
-	pid := os.Getpid()
-	return func(timestamp time.Time, p syslog.Priority, hostname, tag, content string) string {
-		var b strings.Builder
+func rfc5424Formatter(
+	timeFormat, hostname, msgid, tag string,
+	facility syslog.Priority,
+	extra map[string]string) syslog.Formatter {
+	type formatRef struct {
+		Offset  int
+		Message []byte
+		Length  int
+	}
+
+	var (
+		pid     = os.Getpid()
+		b       strings.Builder
+		formats = make(map[syslog.Priority]*formatRef)
+	)
+
+	for _, severity := range []syslog.Priority{syslog.LOG_INFO, syslog.LOG_ERR} {
+		p := (facility & syslog.FacilityMask) | (severity & syslog.SeverityMask)
+		ref := &formatRef{
+			Offset: len(strconv.Itoa(int(p))) + 4,
+		}
 		fmt.Fprintf(&b, "<%d>1 %s %s %s %d %s ",
-			p, timestamp.Format(timeFormat), hostname, tag, pid, msgid)
+			p, time.Now().Format(timeFormat), hostname, tag, pid, msgid)
 		if len(extra) > 0 {
 			b.WriteString("[docker@3071")
 			for k, v := range extra {
@@ -323,8 +340,21 @@ func rfc5424Formatter(timeFormat, msgid string, extra map[string]string) syslog.
 			b.WriteString("-")
 		}
 		b.WriteString(" ")
-		b.WriteString(content)
-		return b.String()
+		ref.Message = []byte(b.String())
+		b.Reset()
+		ref.Length = len(ref.Message)
+		formats[severity] = ref
+	}
+
+	return func(timestamp time.Time, p syslog.Priority, _, _ string, content []byte) []byte {
+		var (
+			ref     = formats[p]
+			message = ref.Message
+		)
+
+		copy(message[ref.Offset:ref.Offset+len(timeFormat)], []byte(timestamp.Format(timeFormat)))
+		message = append(message[:ref.Length], content...)
+		return message
 	}
 }
 
