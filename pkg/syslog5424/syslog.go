@@ -157,6 +157,11 @@ func New(info logger.Info) (logger.Logger, error) {
 }
 
 func (s *syslogger) Log(msg *logger.Message) error {
+	if len(msg.Line) == 0 {
+		logger.PutMessage(msg)
+		return nil
+	}
+
 	if msg.Source == "stderr" {
 		_, err := s.writer.WriteWithTimestampAndPriority(msg.Timestamp, syslog.LOG_ERR, msg.Line)
 		logger.PutMessage(msg)
